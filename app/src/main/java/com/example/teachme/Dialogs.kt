@@ -6,17 +6,17 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.CheckBox
 import android.widget.GridLayout
+import android.widget.Toast
 import com.example.teachme.models.TeacherDetails
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 data object Dialogs {
 
-
     fun openTeacherExtraDetailsDialog(
         context: Context,
         onDetailsSelected: (TeacherDetails) -> Unit,
-    ) {
+    ): AlertDialog {
         val view = LayoutInflater.from(context).inflate(R.layout.teacher_details, null, false)
 
 
@@ -44,12 +44,25 @@ data object Dialogs {
             subjectsGrid.addView(checkBox)
         }
 
-        AlertDialog.Builder(context)
+        val dialog = AlertDialog.Builder(context)
             .setView(view)
             .setPositiveButton("Ok") { _, _ ->
+                if (etPrice.text.toString().isEmpty()
+                    || etDesc.text.toString().isEmpty()
+                    || subjects.isEmpty()
+                ) {
+                    Toast.makeText(
+                        context,
+                        "Please fill all the fields and choose at-least 1 subject",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@setPositiveButton
+                }
                 val price = etPrice.text.toString().toDouble()
                 val desc = etDesc.text.toString()
                 val subs = subjects.toList()
+
+
                 onDetailsSelected.invoke(
                     TeacherDetails(
                         pricePerHour = price,
@@ -59,7 +72,8 @@ data object Dialogs {
                 )
             }
             .setNegativeButton("Cancel", null)
-            .show()
-
+            .create()
+        dialog.show()
+        return dialog
     }
 }
