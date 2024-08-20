@@ -3,14 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/teacherHomeFragment">
+    app:startDestination="@id/lessonRequestsFragment">
 
-
-    <fragment
-        android:id="@+id/teacherHomeFragment"
-        android:name="com.example.teachme.screens.main.teacher.TeacherHomeFragment"
-        android:label="TeacherHomeFragment"
-        tools:layout="@layout/fragment_teacher_home" />
 
     <fragment
         android:id="@+id/profileFragment"
@@ -18,10 +12,15 @@
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile" />
     <fragment
-        tools:layout="@layout/fragment_calendar"
         android:id="@+id/calendarFragment"
         android:name="com.example.teachme.screens.main.CalendarFragment"
-        android:label="CalendarFragment" />
+        android:label="CalendarFragment"
+        tools:layout="@layout/fragment_calendar" />
+    <fragment
+        android:id="@+id/lessonRequestsFragment"
+        android:name="com.example.teachme.screens.main.teacher.LessonRequestsFragment"
+        android:label="LessonRequestsFragment"
+        tools:layout="@layout/fragment_calendar" />
 
 
 </navigation>

@@ -5,5 +5,5 @@ class Student(
     fullName: String = "",
     email: String = "",
     image: String = "",
-    var outgoingRequests: List<LessonRequest> = listOf(),
+    var outgoingRequests: MutableList<LessonRequest> = mutableListOf(),
 ) : User(id, fullName, email, image)

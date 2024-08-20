@@ -1,5 +1,6 @@
-package com.example.teachme.screens.main
+package com.example.teachme.screens.main.teacher
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +10,12 @@ import androidx.fragment.app.activityViewModels
 import com.example.teachme.StudentViewModel
 import com.example.teachme.adapters.LessonRequestsRvAdapter
 import com.example.teachme.databinding.FragmentCalendarBinding
-import com.example.teachme.databinding.FragmentProfileBinding
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.material.snackbar.Snackbar
 
-class CalendarFragment : Fragment() {
+@SuppressLint("NotifyDataSetChanged")
+class LessonRequestsFragment : Fragment() {
 
     private var _binding: FragmentCalendarBinding? = null
     private val binding: FragmentCalendarBinding get() = _binding!!
@@ -34,22 +35,21 @@ class CalendarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.requests.observe(viewLifecycleOwner) { requests ->
-
             binding.rvRequests.adapter = LessonRequestsRvAdapter(
-                if (requests.isNotEmpty()
-                    && requests[0].teacherId == FirebaseAuth.getInstance().uid
-                ) {
-                    requests.filter { it.status == LessonRequestStatus.Approved }
-                } else {
-                    requests
-                },
+                requests,
                 object : LessonRequestsRvAdapter.LessonRequestsListener {
                     override fun approve(request: LessonRequest) {
-                        TODO("Not yet implemented")
+                        viewModel.changeRequestStatus(request, LessonRequestStatus.Approved) {
+                            Snackbar.make(binding.root, "Request approved", Snackbar.LENGTH_LONG)
+                                .show()
+                        }
                     }
 
                     override fun decline(request: LessonRequest) {
-                        TODO("Not yet implemented")
+                        viewModel.changeRequestStatus(request, LessonRequestStatus.Rejected) {
+                            Snackbar.make(binding.root, "Request declined", Snackbar.LENGTH_LONG)
+                                .show()
+                        }
                     }
                 }
             )

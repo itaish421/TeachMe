@@ -102,6 +102,7 @@ class CreateAccountFragment : Fragment() {
                         }
                 }
             } else { // Create Account Student
+                binding.btnCreateAccount.isEnabled = false
                 viewModel.register(
                     form = RegisterForm(
                         teacher = false,
@@ -111,7 +112,7 @@ class CreateAccountFragment : Fragment() {
                         image = selectedProfileImage!!
                     )
                 ) {
-                    binding.btnCreateAccount.isEnabled = false
+                    binding.btnCreateAccount.isEnabled = true
                 }
             }
 

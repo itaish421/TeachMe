@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity() {
                 finish()
                 startActivity(Intent(this, AuthActivity::class.java))
             } else if (userResource.loaded) {
+                // loads the user requests when user is available on Resource
+                viewModel.getMyRequests()
                 if (!viewModel.hasGraph) {
                     val navController = findNavController(R.id.mainNavGraph)
                     val navigationView = binding.bottomNavView

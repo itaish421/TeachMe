@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/teacherHomeFragment"
+        android:id="@+id/lessonRequestsFragment"
         android:icon="@drawable/baseline_book_24"
         android:title="Lessons Requests"
         app:showAsAction="ifRoom" />
@@ -11,7 +11,7 @@
     <item
         android:id="@+id/calendarFragment"
         android:icon="@drawable/baseline_calendar_month_24"
-        android:title="Calendar"
+        android:title="Approved Lessons"
         app:showAsAction="ifRoom" />
 
 

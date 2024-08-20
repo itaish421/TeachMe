@@ -6,5 +6,5 @@ class Teacher(
     email: String = "",
     image: String = "",
     var teacherDetails: TeacherDetails = TeacherDetails(),
-    var incomingRequests: List<LessonRequest> = listOf(),
+    var incomingRequests: MutableList<LessonRequest> = mutableListOf(),
 ) : User(id, fullName, email, image, isTeacher = true)

@@ -10,8 +10,11 @@ import com.example.teachme.StudentViewModel
 import com.example.teachme.adapters.TeacherRvAdapter
 import com.example.teachme.components.TeacherCalendar
 import com.example.teachme.databinding.FragmentStudentHomeBinding
+import com.example.teachme.models.LessonRequest
+import com.example.teachme.models.LessonRequestStatus
 import com.example.teachme.models.Teacher
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 
 class StudentHomeFragment : Fragment() {
 
@@ -40,7 +43,35 @@ class StudentHomeFragment : Fragment() {
                 teachers = it,
                 listener = object : TeacherRvAdapter.TeacherListener {
                     override fun onScheduleWithTeacher(teacher: Teacher) {
-                        TeacherCalendar(teacher)
+                        TeacherCalendar(
+                            teacher,
+                            listener = object : TeacherCalendar.ScheduleListener {
+                                override fun schedule(subject: String, date: Long) {
+                                    val student = viewModel.userState.value?.data ?: return
+
+
+                                    val request = LessonRequest(
+                                        studentId = FirebaseAuth.getInstance().uid!!,
+                                        teacherId = teacher.id,
+                                        teacherImage = teacher.image,
+                                        teacherName = teacher.fullName,
+                                        studentImage = student.image,
+                                        studentName = student.fullName,
+                                        subject = subject,
+                                        date = date,
+                                        status = LessonRequestStatus.Pending
+                                    )
+
+                                    viewModel.scheduleLessonRequest(teacher, request) {
+                                        Snackbar.make(
+                                            binding.root,
+                                            "Sent lesson request to ${teacher.fullName}",
+                                            Snackbar.LENGTH_LONG
+                                        ).show()
+                                    }
+
+                                }
+                            })
                             .show(childFragmentManager, "onScheduleWithTeacher")
                     }
                 }
