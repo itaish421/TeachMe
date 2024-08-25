@@ -92,6 +92,7 @@
                 android:id="@+id/controlsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -116,6 +117,32 @@
                     android:text="Decline"
                     android:textColor="#bd3333"
                     android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/controlsLayoutApproved"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end|center"
+                android:paddingVertical="4dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/contactBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="0dp"
+                    android:background="@drawable/black_border"
+                    android:drawableEnd="@drawable/baseline_call_24"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="0dp"
+                    android:text="Contact"
+                    android:textColor="#4CAF50"
+                    android:textStyle="bold" />
+
 
             </LinearLayout>
 

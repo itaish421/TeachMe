@@ -6,12 +6,12 @@
 
 
     <LinearLayout
-        android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:background="#EDEDED"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rateThisTeacher"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,10 +25,10 @@
             app:cardElevation="16dp">
 
             <ImageView
-                android:scaleType="fitXY"
                 android:id="@+id/teacherImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scaleType="fitXY"
                 android:src="@drawable/person" />
         </com.google.android.material.card.MaterialCardView>
 
@@ -108,8 +108,10 @@
                 android:max="5"
                 android:numStars="5"
                 android:paddingBottom="4dp"
+                android:foregroundTint="#FFC107"
                 android:progressTint="#FFC107"
                 android:rating="5"
+                android:isIndicator="true"
                 android:scaleX="0.6"
                 android:scaleY="0.6"
                 android:stepSize="1"
@@ -117,7 +119,17 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </LinearLayout>
 
+    <Button
+        android:id="@+id/rateThisTeacher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/black"
+        android:text="Rate this teacher"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -58,6 +58,19 @@ class StudentViewModel : ViewModel() {
     }
 
 
+    fun rateTeacher(teacher: Teacher, rating: Double, callback: () -> Unit) {
+        val user = userState.value?.data as? Student ?: return
+        viewModelScope.launch {
+            try {
+                Database.rateTeacher(teacher = teacher, student = user, rating = rating)
+            } catch (e: Exception) {
+                exceptionsState.postValue(e)
+            } finally {
+                callback()
+            }
+        }
+    }
+
     fun getMyRequests() {
         if (requestListener != null) return
         val user = userState.value?.data ?: return

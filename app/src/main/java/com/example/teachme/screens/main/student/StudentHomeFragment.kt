@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.teachme.StudentViewModel
@@ -12,6 +13,7 @@ import com.example.teachme.components.TeacherCalendar
 import com.example.teachme.databinding.FragmentStudentHomeBinding
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -38,9 +40,16 @@ class StudentHomeFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             viewModel.logOut()
         }
+        viewModel.userState.observe(viewLifecycleOwner) {
+            val user = it.data as? Student ?: return@observe
+            val adapter = binding.rvTeachers.adapter as? TeacherRvAdapter ?: return@observe
+            adapter.setStudent(user)
+        }
         viewModel.teachers.observe(viewLifecycleOwner) {
+            val user = viewModel.userState.value?.data as? Student ?: return@observe
             binding.rvTeachers.adapter = TeacherRvAdapter(
                 teachers = it,
+                student = user,
                 listener = object : TeacherRvAdapter.TeacherListener {
                     override fun onScheduleWithTeacher(teacher: Teacher) {
                         TeacherCalendar(
@@ -55,8 +64,10 @@ class StudentHomeFragment : Fragment() {
                                         teacherId = teacher.id,
                                         teacherImage = teacher.image,
                                         teacherName = teacher.fullName,
+                                        teacherPhone=teacher.phone,
                                         studentImage = student.image,
                                         studentName = student.fullName,
+                                        studentPhone=student.phone,
                                         subject = subject,
                                         date = date,
                                         status = LessonRequestStatus.Pending
@@ -73,6 +84,12 @@ class StudentHomeFragment : Fragment() {
                                 }
                             })
                             .show(childFragmentManager, "onScheduleWithTeacher")
+                    }
+
+                    override fun onRateTeacher(teacher: Teacher, rating: Double) {
+                        viewModel.rateTeacher(teacher,rating) {
+                            Snackbar.make(binding.root, "Rating submitted!", Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             )

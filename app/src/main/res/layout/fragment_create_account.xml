@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:translationY="-20dp"
+        android:text="Teach me"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +50,6 @@
         </LinearLayout>
 
 
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/etFullNameLayout"
             android:layout_width="match_parent"
@@ -63,6 +72,19 @@
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etPhoneLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter phone number">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPhonetic" />
         </com.google.android.material.textfield.TextInputLayout>
 
 

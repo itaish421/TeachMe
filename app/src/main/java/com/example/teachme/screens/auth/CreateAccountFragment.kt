@@ -3,6 +3,7 @@ package com.example.teachme.screens.auth
 import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,7 +63,16 @@ class CreateAccountFragment : Fragment() {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
             val fullName = binding.etFullName.text.toString()
+            val phone = binding.etPhone.text.toString()
 
+            if (phone.isEmpty()) {
+                binding.etPhoneLayout.error = "Phone must not be empty"
+                return@setOnClickListener
+            }
+            if (!Patterns.PHONE.matcher(phone).matches()) {
+                binding.etPhoneLayout.error = "Phone invalid"
+                return@setOnClickListener
+            }
             if (email.isEmpty()) {
                 binding.etEmailLayout.error = "Email must not be empty"
                 return@setOnClickListener
@@ -89,6 +99,7 @@ class CreateAccountFragment : Fragment() {
                                     email = email,
                                     password = password,
                                     fullName = fullName,
+                                    phone = phone,
                                     image = selectedProfileImage!!
                                 )
                             ) {
@@ -108,6 +119,7 @@ class CreateAccountFragment : Fragment() {
                         teacher = false,
                         email = email,
                         password = password,
+                        phone = phone,
                         fullName = fullName,
                         image = selectedProfileImage!!
                     )

@@ -8,5 +8,6 @@ class RegisterForm(
     var password: String,
     var fullName: String,
     var image: Uri,
+    var phone: String,
     var teacherDetails: TeacherDetails? = null,
 )

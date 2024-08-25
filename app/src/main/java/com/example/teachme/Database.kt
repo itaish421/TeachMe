@@ -97,6 +97,32 @@ data object Database {
     }
 
 
+    suspend fun rateTeacher(
+        teacher: Teacher,
+        student: Student,
+        rating: Double,
+    ) = withContext(Dispatchers.IO) {
+        val value = CompletableDeferred<Double>()
+        teacher.ratings.add(rating)
+        student.ratedTeachers.add(teacher.id)
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(teacher.id)
+            .set(teacher)
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(student.id)
+            .set(student)
+            .addOnSuccessListener {
+                value.complete(rating)
+            }
+            .addOnFailureListener {
+                value.completeExceptionally(it)
+            }
+        value.await()
+    }
+
     suspend fun scheduleLessonRequest(
         teacher: Teacher,
         request: LessonRequest,
@@ -116,6 +142,7 @@ data object Database {
                     .collection("users")
                     .document(teacher.id)
                     .set(teacher)
+
             }
             .addOnFailureListener {
                 value.completeExceptionally(it)
@@ -227,6 +254,7 @@ data object Database {
                                     id = authResult.user!!.uid,
                                     fullName = form.fullName,
                                     email = form.email,
+                                    phone = form.phone,
                                     image = imageUrl,
                                     teacherDetails = details
                                 )

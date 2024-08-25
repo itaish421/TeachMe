@@ -1,5 +1,7 @@
 package com.example.teachme.adapters
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,12 +32,22 @@ class LessonRequestsRvAdapter(
         private val binding: LessonItemBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
+
+        fun openPhone(phone: String) {
+            val intent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:$phone")
+            }
+            binding.root.context.startActivity(intent)
+        }
+
         fun bind(request: LessonRequest, pos: Int) {
 
             binding.tvStatus.text = request.status.name
             binding.lessonSubjectTv.text = request.subject
 
             if (isTeacher) {
+
+
                 if (request.status == LessonRequestStatus.Pending) {
                     binding.controlsLayout.visibility = View.VISIBLE
                     binding.scheduleBtnApprove.setOnClickListener {
@@ -46,10 +58,14 @@ class LessonRequestsRvAdapter(
                         listener?.decline(request)
                         notifyItemChanged(pos)
                     }
-                }
-                else {
+                } else {
                     binding.controlsLayout.visibility = View.GONE
-
+                    if (request.status == LessonRequestStatus.Approved) {
+                        binding.controlsLayoutApproved.visibility = View.VISIBLE
+                        binding.contactBtn.setOnClickListener {
+                            openPhone(request.studentPhone)
+                        }
+                    }
                 }
                 Picasso.get()
                     .load(request.studentImage)
@@ -57,6 +73,12 @@ class LessonRequestsRvAdapter(
                 binding.lessonNameTv.text = request.studentName
             } else {
                 binding.controlsLayout.visibility = View.GONE
+                if (request.status == LessonRequestStatus.Approved) {
+                    binding.controlsLayoutApproved.visibility = View.VISIBLE
+                    binding.contactBtn.setOnClickListener {
+                        openPhone(request.teacherPhone)
+                    }
+                }
                 Picasso.get()
                     .load(request.teacherImage)
                     .into(binding.teacherImage)
