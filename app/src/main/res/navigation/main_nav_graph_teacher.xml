@@ -23,4 +23,24 @@
         tools:layout="@layout/fragment_calendar" />
 
 
+    <fragment
+        android:id="@+id/chatsFragment"
+        android:name="com.example.teachme.screens.main.ChatsFragment"
+        android:label="ChatsFragment"
+        tools:layout="@layout/fragment_chats">
+        <action
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.teachme.screens.main.ChatFragment"
+        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="chatId"
+            app:argType="string" />
+    </fragment>
+
+
 </navigation>

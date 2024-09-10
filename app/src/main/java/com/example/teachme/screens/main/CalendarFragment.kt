@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import com.example.teachme.R
 import com.example.teachme.StudentViewModel
 import com.example.teachme.adapters.LessonRequestsRvAdapter
 import com.example.teachme.databinding.FragmentCalendarBinding
 import com.example.teachme.databinding.FragmentProfileBinding
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.Teacher
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 
 class CalendarFragment : Fragment() {
@@ -34,7 +38,13 @@ class CalendarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.requests.observe(viewLifecycleOwner) { requests ->
-
+            val currentUser = viewModel.userState.value?.data ?: return@observe
+            if(requests.isEmpty()) {
+                binding.noLessonsLayout.visibility = View.VISIBLE
+                binding.exploreTeachers.setOnClickListener {
+                    findNavController().popBackStack()
+                }
+            }
             binding.rvRequests.adapter = LessonRequestsRvAdapter(
                 if (requests.isNotEmpty()
                     && requests[0].teacherId == FirebaseAuth.getInstance().uid
@@ -43,14 +53,36 @@ class CalendarFragment : Fragment() {
                 } else {
                     requests
                 },
-                object : LessonRequestsRvAdapter.LessonRequestsListener {
-                    override fun approve(request: LessonRequest) {
-                        TODO("Not yet implemented")
-                    }
+                if(currentUser.isTeacher) {
+                    LessonRequestsRvAdapter.LessonRequestActions.TeacherActions(
+                        object : LessonRequestsRvAdapter.TeacherAction {
+                            override fun approve(request: LessonRequest) {
+                                viewModel.changeRequestStatus(request, LessonRequestStatus.Approved) {
+                                    Snackbar.make(binding.root, "Request approved", Snackbar.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
 
-                    override fun decline(request: LessonRequest) {
-                        TODO("Not yet implemented")
-                    }
+                            override fun decline(request: LessonRequest) {
+                                viewModel.changeRequestStatus(request, LessonRequestStatus.Rejected) {
+                                    Snackbar.make(binding.root, "Request declined", Snackbar.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
+                        }
+                    )
+                }
+                else {
+                    LessonRequestsRvAdapter.LessonRequestActions.StudentActions(
+                        object : LessonRequestsRvAdapter.StudentAction {
+                            override fun startChat(teacher: Teacher) {
+                                viewModel.startChatWithTeacher(teacher) {
+                                    val act = CalendarFragmentDirections.actionCalendarFragmentToChatFragment(it.id)
+                                    findNavController().navigate(act)
+                                }
+                            }
+                        }
+                    )
                 }
             )
         }

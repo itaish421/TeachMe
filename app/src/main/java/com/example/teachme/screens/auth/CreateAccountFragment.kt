@@ -54,11 +54,6 @@ class CreateAccountFragment : Fragment() {
         }
         binding.btnCreateAccount.setOnClickListener {
 
-            if (selectedProfileImage == null) {
-                Toast.makeText(requireContext(), "Please pick profile image", Toast.LENGTH_LONG)
-                    .show()
-                return@setOnClickListener
-            }
 
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
@@ -121,7 +116,7 @@ class CreateAccountFragment : Fragment() {
                         password = password,
                         phone = phone,
                         fullName = fullName,
-                        image = selectedProfileImage!!
+                        image = selectedProfileImage
                     )
                 ) {
                     binding.btnCreateAccount.isEnabled = true
@@ -134,7 +129,6 @@ class CreateAccountFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         extraDetailsDialog = null
-        _binding = null
     }
 
 }

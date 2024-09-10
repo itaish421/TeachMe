@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">TeachMe</string>
+    <string name="no_lessons">
+    It looks like you do not have any lessons scheduled at the moment. But do not worry, this is a great opportunity to plan ahead and fill your calendar with exciting new lessons!
+    To schedule a lesson, simply head over to the home page and explore the available options. You can choose from a variety of topics and find the perfect time that fits your schedule. Whether you are looking to learn something new or continue your progress, there is always something valuable to explore.
+    Take a moment to organize your upcoming learning journey and get ready to make the most of your time!
+</string>
+
 </resources>

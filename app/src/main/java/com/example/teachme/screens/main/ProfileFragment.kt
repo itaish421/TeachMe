@@ -12,6 +12,9 @@ import com.example.teachme.models.LessonRequestStatus
 import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
 import com.squareup.picasso.Picasso
+import java.util.Timer
+import java.util.TimerTask
+import kotlin.concurrent.timerTask
 
 class ProfileFragment : Fragment() {
 
@@ -30,11 +33,45 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
+
+    val vowList = listOf(
+        "inspire and empower each student to reach their full potential.",
+        "create a supportive and engaging learning environment.",
+        "provide personalized attention tailored to each learner's needs.",
+        "foster a love for learning through innovative and interactive methods.",
+        "stay updated with the latest educational practices and technologies.",
+        "encourage critical thinking and problem-solving skills.",
+        "uphold the highest standards of integrity and professionalism.",
+        "celebrate each student’s unique strengths and achievements.",
+        "build strong, positive relationships with students and their families.",
+        "continuously strive for excellence in education and personal development."
+    )
+    private var vowsTimer: Timer? = null
+    override fun onPause() {
+        super.onPause()
+        vowsTimer?.cancel()
+    }
+    override fun onResume() {
+        super.onResume()
+        vowsTimer?.cancel()
+        vowsTimer = Timer()
+        vowsTimer?.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                requireActivity().runOnUiThread {
+                    binding.vows.text = vowList.random()
+                }
+            }
+        }, 0, 4000)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         viewModel.userState.observe(viewLifecycleOwner) {
             val user = it.data ?: return@observe
+
+
             if (user is Student) {
                 binding.tvSubjectsITeach.visibility = View.GONE
             } else {
@@ -42,7 +79,7 @@ class ProfileFragment : Fragment() {
                 binding.tvSubjectsITeach.text =
                     "Subjects i teach: ${teacher.teacherDetails.subjects.joinToString(", ")}"
             }
-
+            binding.hiTv.text = "Hi ${user.fullName}"
             binding.tvFullName.text = "Name: ${user.fullName}"
             Picasso.get()
                 .load(user.image)

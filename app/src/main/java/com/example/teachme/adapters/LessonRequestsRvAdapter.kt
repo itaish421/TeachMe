@@ -9,18 +9,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.teachme.databinding.LessonItemBinding
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.Teacher
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
+
 class LessonRequestsRvAdapter(
     private val requests: List<LessonRequest>,
-    private val listener: LessonRequestsListener? = null,
+    private val actions: LessonRequestActions,
 ) : RecyclerView.Adapter<LessonRequestsRvAdapter.LessonRequestViewHolder>() {
-    interface LessonRequestsListener {
+    interface TeacherAction {
         fun approve(request: LessonRequest)
         fun decline(request: LessonRequest)
     }
 
+    interface StudentAction {
+        fun startChat(teacher: Teacher)
+    }
+
+    sealed class LessonRequestActions {
+        data class TeacherActions(val listener: TeacherAction) : LessonRequestActions()
+        data class StudentActions(val listener: StudentAction) : LessonRequestActions()
+    }
 
     private val isTeacher: Boolean = if (requests.isEmpty()) {
         false
@@ -33,7 +43,7 @@ class LessonRequestsRvAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
 
-        fun openPhone(phone: String) {
+        private fun openPhone(phone: String) {
             val intent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:$phone")
             }
@@ -46,16 +56,15 @@ class LessonRequestsRvAdapter(
             binding.lessonSubjectTv.text = request.subject
 
             if (isTeacher) {
-
-
+                val action = actions as LessonRequestActions.TeacherActions
                 if (request.status == LessonRequestStatus.Pending) {
                     binding.controlsLayout.visibility = View.VISIBLE
                     binding.scheduleBtnApprove.setOnClickListener {
-                        listener?.approve(request)
+                        action.listener.approve(request)
                         notifyItemChanged(pos)
                     }
                     binding.scheduleBtnDecline.setOnClickListener {
-                        listener?.decline(request)
+                        action.listener.decline(request)
                         notifyItemChanged(pos)
                     }
                 } else {
@@ -72,7 +81,21 @@ class LessonRequestsRvAdapter(
                     .into(binding.teacherImage)
                 binding.lessonNameTv.text = request.studentName
             } else {
-                binding.controlsLayout.visibility = View.GONE
+                val action = actions as LessonRequestActions.StudentActions
+                binding.startChatWithTeacherBtn.setOnClickListener {
+                    action.listener.startChat(
+                        Teacher(
+                            id = request.teacherId,
+                            phone = request.teacherPhone,
+                            fullName = request.teacherName,
+                            image = request.teacherImage
+                        )
+                    )
+                }
+                binding.startChatWithTeacherBtn.visibility = View.VISIBLE
+                binding.controlsLayout.visibility = View.VISIBLE
+                binding.scheduleBtnApprove.visibility = View.GONE
+                binding.scheduleBtnDecline.visibility = View.GONE
                 if (request.status == LessonRequestStatus.Approved) {
                     binding.controlsLayoutApproved.visibility = View.VISIBLE
                     binding.contactBtn.setOnClickListener {

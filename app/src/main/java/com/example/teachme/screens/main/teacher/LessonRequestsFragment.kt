@@ -12,6 +12,7 @@ import com.example.teachme.adapters.LessonRequestsRvAdapter
 import com.example.teachme.databinding.FragmentCalendarBinding
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.Teacher
 import com.google.android.material.snackbar.Snackbar
 
 @SuppressLint("NotifyDataSetChanged")
@@ -35,23 +36,40 @@ class LessonRequestsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.requests.observe(viewLifecycleOwner) { requests ->
+            val currentUser = viewModel.userState.value?.data ?: return@observe
             binding.rvRequests.adapter = LessonRequestsRvAdapter(
                 requests,
-                object : LessonRequestsRvAdapter.LessonRequestsListener {
-                    override fun approve(request: LessonRequest) {
-                        viewModel.changeRequestStatus(request, LessonRequestStatus.Approved) {
-                            Snackbar.make(binding.root, "Request approved", Snackbar.LENGTH_LONG)
-                                .show()
-                        }
-                    }
+                if(currentUser.isTeacher) {
+                    LessonRequestsRvAdapter.LessonRequestActions.TeacherActions(
+                        object : LessonRequestsRvAdapter.TeacherAction {
+                            override fun approve(request: LessonRequest) {
+                                viewModel.changeRequestStatus(request, LessonRequestStatus.Approved) {
+                                    Snackbar.make(binding.root, "Request approved", Snackbar.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
 
-                    override fun decline(request: LessonRequest) {
-                        viewModel.changeRequestStatus(request, LessonRequestStatus.Rejected) {
-                            Snackbar.make(binding.root, "Request declined", Snackbar.LENGTH_LONG)
-                                .show()
+                            override fun decline(request: LessonRequest) {
+                                viewModel.changeRequestStatus(request, LessonRequestStatus.Rejected) {
+                                    Snackbar.make(binding.root, "Request declined", Snackbar.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
                         }
-                    }
+                    )
                 }
+                else {
+                    LessonRequestsRvAdapter.LessonRequestActions.StudentActions(
+                        object : LessonRequestsRvAdapter.StudentAction {
+                            override fun startChat(teacher: Teacher) {
+                                viewModel.startChatWithTeacher(teacher) {
+                                    // go to chats screen
+                                }
+                            }
+                        }
+                    )
+                }
+
             )
         }
     }

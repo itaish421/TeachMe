@@ -7,7 +7,7 @@ class RegisterForm(
     var email: String,
     var password: String,
     var fullName: String,
-    var image: Uri,
+    var image: Uri?,
     var phone: String,
     var teacherDetails: TeacherDetails? = null,
 )

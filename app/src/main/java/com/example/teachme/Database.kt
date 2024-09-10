@@ -4,14 +4,21 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.teachme.models.ChatRoom
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.Message
 import com.example.teachme.models.RegisterForm
 import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
 import com.example.teachme.models.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
@@ -96,6 +103,107 @@ data object Database {
 
     }
 
+
+    fun sendMessageToChat(chatRoom: ChatRoom, sender: String, content: String) {
+        val message = Message(
+            sender = sender,
+            content = content
+        )
+        chatRoom.messages.add(message)
+        FirebaseDatabase.getInstance()
+            .getReference("chats")
+            .child(chatRoom.id)
+            .setValue(chatRoom)
+    }
+
+    fun listenToChat(chatId: String, callback: (ChatRoom) -> Unit): ValueEventListener {
+        return FirebaseDatabase.getInstance()
+            .getReference("chats")
+            .child(chatId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val room = snapshot.getValue(ChatRoom::class.java) ?: return
+                    callback.invoke(room)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
+    }
+
+    private suspend fun hasChatWithTeacher(teacher: Teacher, student: Student) =
+        withContext(Dispatchers.IO) {
+            val value = CompletableDeferred<ChatRoom?>()
+
+            FirebaseDatabase.getInstance().getReference("chats")
+                .get()
+                .addOnSuccessListener {
+                    if (it.exists() && it.childrenCount > 0) {
+                        it.children.mapNotNull { roomData ->
+                            roomData.getValue(ChatRoom::class.java)
+                        }.first { room ->
+                            room.teacher.id == teacher.id && room.student.id == student.id
+                        }.let { room ->
+                            value.complete(
+                                room
+                            )
+                        }
+                    } else {
+                        value.complete(null)
+                    }
+                }
+                .addOnFailureListener {
+                    value.complete(null)
+                }
+            value.await()
+        }
+
+    suspend fun startChatWithTeacher(teacher: Teacher, student: Student) =
+        withContext(Dispatchers.IO) {
+            val value = CompletableDeferred<ChatRoom>()
+            val chatRoomExisting = hasChatWithTeacher(teacher, student)
+            chatRoomExisting?.let {
+                value.complete(it)
+            } ?: run {
+                val newDoc = FirebaseDatabase.getInstance().getReference("chats").push()
+                val newRoom = ChatRoom(
+                    id = newDoc.key!!,
+                    teacher = teacher,
+                    student = student,
+                    studentId = student.id,
+                    teacherId = teacher.id,
+                    messages = mutableListOf()
+                )
+                newDoc.setValue(newRoom)
+                    .addOnSuccessListener {
+                        value.complete(newRoom)
+                    }
+                    .addOnFailureListener {
+                        value.completeExceptionally(it)
+                    }
+            }
+            value.await()
+        }
+
+
+    @Throws(Exception::class)
+    suspend fun getChats() = withContext(Dispatchers.IO) {
+        val value = CompletableDeferred<List<ChatRoom>>()
+        val currentUserId = FirebaseAuth.getInstance().uid!!
+        val baseQuery: Query = FirebaseDatabase.getInstance().getReference("chats")
+
+        baseQuery.get()
+            .addOnSuccessListener {
+                val rooms = it.children.mapNotNull { room -> room.getValue(ChatRoom::class.java) }
+                    .filter { room -> room.studentId == currentUserId || room.teacherId == currentUserId }
+                value.complete(rooms)
+            }
+            .addOnFailureListener {
+                value.completeExceptionally(it)
+            }
+        value.await()
+    }
 
     suspend fun rateTeacher(
         teacher: Teacher,
@@ -245,8 +353,11 @@ data object Database {
                     // create Document for user in database
                     coroutineScope.launch(Dispatchers.IO) {
                         try {
-                            val imageUrl =
-                                uploadImage(form.image, "userImages/${authResult.user!!.uid}")
+                            val imageUrl = form.image?.let {
+                                uploadImage(it, "userImages/${authResult.user!!.uid}")
+                            }
+                                ?: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROgY9BG36B1t7RZCr_i18RcjgfSJTFyUx0-w&s"
+
                             if (form.teacher) {
                                 val details = form.teacherDetails!!
 

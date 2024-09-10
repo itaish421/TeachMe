@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.teachme.AuthViewModel
+import com.example.teachme.Dialogs
 import com.example.teachme.R
 import com.example.teachme.databinding.FragmentSignInBinding
 
@@ -30,6 +31,10 @@ class SignInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        binding.forgotPass.setOnClickListener {
+            Dialogs.openPasswordResetDialog(requireContext())
+        }
         binding.btnNoAccount.setOnClickListener {
             findNavController().navigate(R.id.action_signInFragment_to_createAccountFragment)
         }

@@ -66,6 +66,15 @@
             android:backgroundTint="@android:color/transparent"
             android:text="Don't have an account? Create one now"
             android:textColor="@color/black" />
+
+        <Button
+            android:id="@+id/forgotPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:backgroundTint="@android:color/transparent"
+            android:text="Forgot password?"
+            android:textColor="@color/black" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,5 +21,9 @@
         android:title="Profile"
         app:showAsAction="ifRoom" />
 
-
+    <item
+        android:id="@+id/chatsFragment"
+        android:icon="@drawable/baseline_chat_bubble_24"
+        android:title="Chats"
+        app:showAsAction="ifRoom" />
 </menu>

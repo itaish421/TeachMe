@@ -10,8 +10,41 @@ import android.widget.Toast
 import com.example.teachme.models.TeacherDetails
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 
 data object Dialogs {
+
+
+    fun openPasswordResetDialog(context: Context) {
+
+        val view = LayoutInflater.from(context).inflate(R.layout.forgot_pass, null, false)
+
+        val etEmail = view.findViewById<TextInputEditText>(R.id.emailAddressEt)
+        AlertDialog.Builder(context)
+            .setView(view)
+            .setPositiveButton("Send link") { _, _ ->
+                val email = etEmail.text.toString()
+                if (email.isEmpty()) {
+                    Toast.makeText(context, "Email empty", Toast.LENGTH_LONG).show()
+                } else {
+                    FirebaseAuth.getInstance()
+                        .sendPasswordResetEmail(email)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                context,
+                                "Email sent, check your email box and spam box",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                        }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+
+    }
 
     fun openTeacherExtraDetailsDialog(
         context: Context,

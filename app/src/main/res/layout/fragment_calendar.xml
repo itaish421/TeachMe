@@ -15,4 +15,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/lesson_item" />
+
+    <LinearLayout
+        android:id="@+id/noLessonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_margin="16dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/owl" />
+
+        <TextView
+            android:id="@+id/noLessonsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="No Lessons Scheduled"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/noLessons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/no_lessons"
+            android:textAlignment="center"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/exploreTeachers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+            android:text="Explore teachers" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
