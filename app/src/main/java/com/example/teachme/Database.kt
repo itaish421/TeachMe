@@ -142,7 +142,7 @@ data object Database {
                     if (it.exists() && it.childrenCount > 0) {
                         it.children.mapNotNull { roomData ->
                             roomData.getValue(ChatRoom::class.java)
-                        }.first { room ->
+                        }.firstOrNull { room ->
                             room.teacher.id == teacher.id && room.student.id == student.id
                         }.let { room ->
                             value.complete(

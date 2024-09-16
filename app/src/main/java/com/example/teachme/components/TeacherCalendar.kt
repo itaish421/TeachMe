@@ -71,6 +71,7 @@ class TeacherCalendar(
             android.R.layout.simple_spinner_item,
             teacher.teacherDetails.subjects
         )
+        binding.teacherCalendar.minDate = System.currentTimeMillis()
         binding.teacherCalendar.setOnDateChangeListener { p0, y, m, d ->
             println("${d},${m},${y}")
             this.d = d
@@ -127,10 +128,15 @@ class TeacherCalendar(
             }
             .toSet()
 
+        val c = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+        }
+        val h = c.get(Calendar.HOUR_OF_DAY)
         for (i in 8..20) {
             val radioButton = RadioButton(requireContext())
+
             date.set(Calendar.HOUR_OF_DAY, i)
-            if (unavailableDates.any {
+            if (h >= i || unavailableDates.any {
                     val c = Calendar.getInstance()
                     c.timeInMillis = it
                     return@any c.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH)

@@ -95,14 +95,9 @@ class CreateAccountFragment : Fragment() {
                                     password = password,
                                     fullName = fullName,
                                     phone = phone,
-                                    image = selectedProfileImage!!
+                                    image = selectedProfileImage
                                 )
                             ) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Registration successfully",
-                                    Toast.LENGTH_LONG
-                                ).show()
                                 binding.btnCreateAccount.isEnabled = true
                             }
                         }
