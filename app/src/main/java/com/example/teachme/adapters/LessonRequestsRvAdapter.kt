@@ -113,7 +113,7 @@ class LessonRequestsRvAdapter(
         }
 
         private fun formatDate(date: Long): String {
-            return android.text.format.DateFormat.format("dd/MM/yyyy HH:mm", date).toString()
+            return android.text.format.DateFormat.format("dd/MM/yyyy HH:00", date).toString()
 
         }
     }
