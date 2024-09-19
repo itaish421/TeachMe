@@ -54,6 +54,7 @@ class LessonRequestsRvAdapter(
 
             binding.tvStatus.text = request.status.name
             binding.lessonSubjectTv.text = request.subject
+            binding.lessonDateTv.text = formatDate(request.date)
 
             if (isTeacher) {
                 val action = actions as LessonRequestActions.TeacherActions
@@ -92,6 +93,8 @@ class LessonRequestsRvAdapter(
                         )
                     )
                 }
+
+
                 binding.startChatWithTeacherBtn.visibility = View.VISIBLE
                 binding.controlsLayout.visibility = View.VISIBLE
                 binding.scheduleBtnApprove.visibility = View.GONE
@@ -107,6 +110,11 @@ class LessonRequestsRvAdapter(
                     .into(binding.teacherImage)
                 binding.lessonNameTv.text = request.teacherName
             }
+        }
+
+        private fun formatDate(date: Long): String {
+            return android.text.format.DateFormat.format("dd/MM/yyyy HH:mm", date).toString()
+
         }
     }
 

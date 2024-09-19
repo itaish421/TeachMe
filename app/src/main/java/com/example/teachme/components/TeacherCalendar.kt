@@ -136,7 +136,7 @@ class TeacherCalendar(
             val radioButton = RadioButton(requireContext())
 
             date.set(Calendar.HOUR_OF_DAY, i)
-            if (h >= i || unavailableDates.any {
+            if ((h >= i && itsToday()) || unavailableDates.any {
                     val c = Calendar.getInstance()
                     c.timeInMillis = it
                     return@any c.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH)
@@ -173,6 +173,13 @@ class TeacherCalendar(
                 }
             }
         }
+    }
+
+    private fun itsToday(): Boolean {
+        val today = Calendar.getInstance()
+        return d == today.get(Calendar.DAY_OF_MONTH)
+                && y == today.get(Calendar.YEAR)
+                && m == today.get(Calendar.MONTH)
     }
 
 

@@ -1,8 +1,6 @@
 package com.example.teachme.screens.main
 
-import android.content.DialogInterface
-import android.content.DialogInterface.OnCancelListener
-import android.content.DialogInterface.OnClickListener
+
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,17 +9,21 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.navigation.NavGraph
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.teachme.LoadingState
 import com.example.teachme.R
 import com.example.teachme.StudentViewModel
+import com.example.teachme.WeatherService
 import com.example.teachme.databinding.ActivityMainBinding
 import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
 import com.example.teachme.screens.auth.AuthActivity
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +41,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        val weatherService = WeatherService()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val weather = weatherService.openRequest()
+            withContext(Dispatchers.Main) {
+                binding.currentWeather.text ="Current weather (Tel Aviv): ${weather.current.temperature}°C"
+            }
+        }
 
         viewModel.exceptionsState.observe(this) {
             Snackbar.make(
