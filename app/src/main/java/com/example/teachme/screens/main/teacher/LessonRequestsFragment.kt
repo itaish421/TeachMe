@@ -35,7 +35,7 @@ class LessonRequestsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.requests.observe(viewLifecycleOwner) { requests ->
+        viewModel.requestsMediator.observe(viewLifecycleOwner) { requests ->
             val currentUser = viewModel.userState.value?.data ?: return@observe
             binding.rvRequests.adapter = LessonRequestsRvAdapter(
                 requests,

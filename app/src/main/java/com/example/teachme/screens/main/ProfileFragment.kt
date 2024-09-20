@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.teachme.StudentViewModel
@@ -11,6 +12,7 @@ import com.example.teachme.databinding.FragmentProfileBinding
 import com.example.teachme.models.LessonRequestStatus
 import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
+import com.example.teachme.screens.UpdateProfileDialog
 import com.squareup.picasso.Picasso
 import java.util.Timer
 import java.util.TimerTask
@@ -67,6 +69,17 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
+        binding.btnEditProfile.setOnClickListener {
+            val user = viewModel.userState.value?.data ?: return@setOnClickListener
+
+            UpdateProfileDialog(user) { newName, newImage ->
+
+                viewModel.updateUser(newName, newImage) {
+                    Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_LONG).show()
+                }
+            }.show(childFragmentManager, "UpdateProfileDialog")
+        }
 
         viewModel.userState.observe(viewLifecycleOwner) {
             val user = it.data ?: return@observe

@@ -8,16 +8,23 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.teachme.databinding.LessonItemBinding
 import com.example.teachme.models.LessonRequest
+import com.example.teachme.models.LessonRequestPopulated
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.LessonRequestsData
 import com.example.teachme.models.Teacher
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
 
+
+
 class LessonRequestsRvAdapter(
-    private val requests: List<LessonRequest>,
+    private val data: LessonRequestsData,
     private val actions: LessonRequestActions,
 ) : RecyclerView.Adapter<LessonRequestsRvAdapter.LessonRequestViewHolder>() {
+
+    val requests = data.requests.map {  it.populated(data.users)  }
+
     interface TeacherAction {
         fun approve(request: LessonRequest)
         fun decline(request: LessonRequest)
@@ -50,7 +57,7 @@ class LessonRequestsRvAdapter(
             binding.root.context.startActivity(intent)
         }
 
-        fun bind(request: LessonRequest, pos: Int) {
+        fun bind(request: LessonRequestPopulated, pos: Int) {
 
             binding.tvStatus.text = request.status.name
             binding.lessonSubjectTv.text = request.subject
@@ -73,23 +80,23 @@ class LessonRequestsRvAdapter(
                     if (request.status == LessonRequestStatus.Approved) {
                         binding.controlsLayoutApproved.visibility = View.VISIBLE
                         binding.contactBtn.setOnClickListener {
-                            openPhone(request.studentPhone)
+                            openPhone(request.student.phone)
                         }
                     }
                 }
                 Picasso.get()
-                    .load(request.studentImage)
+                    .load(request.student.image)
                     .into(binding.teacherImage)
-                binding.lessonNameTv.text = request.studentName
+                binding.lessonNameTv.text = request.student.fullName
             } else {
                 val action = actions as LessonRequestActions.StudentActions
                 binding.startChatWithTeacherBtn.setOnClickListener {
                     action.listener.startChat(
                         Teacher(
                             id = request.teacherId,
-                            phone = request.teacherPhone,
-                            fullName = request.teacherName,
-                            image = request.teacherImage
+                            phone = request.teacher.phone,
+                            fullName = request.teacher.fullName,
+                            image = request.teacher.image
                         )
                     )
                 }
@@ -102,19 +109,18 @@ class LessonRequestsRvAdapter(
                 if (request.status == LessonRequestStatus.Approved) {
                     binding.controlsLayoutApproved.visibility = View.VISIBLE
                     binding.contactBtn.setOnClickListener {
-                        openPhone(request.teacherPhone)
+                        openPhone(request.teacher.phone)
                     }
                 }
                 Picasso.get()
-                    .load(request.teacherImage)
+                    .load(request.teacher.image)
                     .into(binding.teacherImage)
-                binding.lessonNameTv.text = request.teacherName
+                binding.lessonNameTv.text = request.teacher.fullName
             }
         }
 
         private fun formatDate(date: Long): String {
             return android.text.format.DateFormat.format("dd/MM/yyyy HH:00", date).toString()
-
         }
     }
 

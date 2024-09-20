@@ -1,6 +1,6 @@
 package com.example.teachme
 
-import android.provider.ContactsContract.Data
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.teachme.models.ChatRoom
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
+import com.example.teachme.models.LessonRequestsData
+import com.example.teachme.models.LessonRequestsMediator
 import com.example.teachme.models.Student
 import com.example.teachme.models.Teacher
 import com.example.teachme.models.User
@@ -17,11 +19,12 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 
+
 class StudentViewModel : ViewModel() {
 
     val loadingState = MutableLiveData<LoadingState>(LoadingState.Loaded)
     val exceptionsState = MutableLiveData<Exception>()
-    val userState: LiveData<Resource<User>> = Database.userLiveData
+    val userState: MutableLiveData<Resource<User>> = Database.userLiveData
 
     private val _teachers = MutableLiveData<List<Teacher>>(listOf())
     val teachers: LiveData<List<Teacher>> get() = _teachers
@@ -31,6 +34,11 @@ class StudentViewModel : ViewModel() {
     private var requestListener: ListenerRegistration? = null
     private val _requests = MutableLiveData<List<LessonRequest>>(listOf())
     val requests: LiveData<List<LessonRequest>> get() = _requests
+    val users : MutableLiveData<List<User>> = MutableLiveData()
+
+    val requestsMediator : LiveData<LessonRequestsData> by LessonRequestsMediator(users,requests)
+
+    var usersListener: ListenerRegistration? = null
 
     private val _myChats: MutableLiveData<List<ChatRoom>> = MutableLiveData()
     val myChats: LiveData<List<ChatRoom>> get() = _myChats
@@ -45,6 +53,7 @@ class StudentViewModel : ViewModel() {
             teachersLiveData = _teachers,
             exceptionLiveData = exceptionsState
         )
+        usersListener = Database.listenUsers(users)
     }
 
     fun sendMessageToChat(content: String) {
@@ -65,6 +74,24 @@ class StudentViewModel : ViewModel() {
         return currChatListener!!
     }
 
+
+    fun updateUser(newName: String, newImage: Uri?, callback: () -> Unit) {
+
+        val currentUser = userState.value?.data ?:return
+        viewModelScope.launch {
+
+            try {
+                loadingState.postValue(LoadingState.Loading)
+                val newUser = Database.updateUser(currentUser, newName, newImage)
+                userState.postValue(Resource(data=newUser, loaded = true))
+            } catch (e: Exception) {
+                exceptionsState.postValue(e)
+            } finally {
+                loadingState.postValue(LoadingState.Loaded)
+                callback()
+            }
+        }
+    }
     fun invokeGetChats() {
         viewModelScope.launch {
             try {
@@ -73,7 +100,6 @@ class StudentViewModel : ViewModel() {
             } catch (e: Exception) {
                 exceptionsState.postValue(e)
             }
-
         }
     }
 
@@ -164,6 +190,7 @@ class StudentViewModel : ViewModel() {
         super.onCleared()
         Database.stopListening()
         requestListener?.remove()
+        usersListener?.remove()
     }
 
     fun logOut() {

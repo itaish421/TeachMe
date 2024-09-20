@@ -62,12 +62,6 @@ class StudentHomeFragment : Fragment() {
                                     val request = LessonRequest(
                                         studentId = FirebaseAuth.getInstance().uid!!,
                                         teacherId = teacher.id,
-                                        teacherImage = teacher.image,
-                                        teacherName = teacher.fullName,
-                                        teacherPhone=teacher.phone,
-                                        studentImage = student.image,
-                                        studentName = student.fullName,
-                                        studentPhone=student.phone,
                                         subject = subject,
                                         date = date,
                                         status = LessonRequestStatus.Pending

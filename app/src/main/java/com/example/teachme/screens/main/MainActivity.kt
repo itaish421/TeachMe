@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.example.teachme.Database
 import com.example.teachme.LoadingState
 import com.example.teachme.R
 import com.example.teachme.StudentViewModel
@@ -46,10 +47,13 @@ class MainActivity : AppCompatActivity() {
         val weatherService = WeatherService()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val weather = weatherService.openRequest()
-            withContext(Dispatchers.Main) {
-                binding.currentWeather.text ="Current weather (Tel Aviv): ${weather.current.temperature}°C"
-            }
+            try {
+                val weather = weatherService.openRequest()
+                withContext(Dispatchers.Main) {
+                    binding.currentWeather.text =
+                        "Current weather (Tel Aviv): ${weather.current.temperature}°C"
+                }
+            } catch(ignored : Exception) {}
         }
 
         viewModel.exceptionsState.observe(this) {

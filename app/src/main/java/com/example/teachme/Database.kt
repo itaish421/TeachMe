@@ -20,7 +20,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirestoreRegistrar
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -67,6 +69,18 @@ data object Database {
         }
     }
 
+    fun deleteAllRequests() {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .get()
+            .addOnSuccessListener {
+                it.forEach {  doc ->
+                    doc.reference.update("incomingRequests", listOf<LessonRequest>())
+                    doc.reference.update("outgoingRequests", listOf<LessonRequest>())
+                }
+            }
+    }
+
 
     fun startListening() {
         userDocumentListenerRegistration?.remove()
@@ -78,6 +92,24 @@ data object Database {
         userDocumentListenerRegistration?.remove()
     }
 
+    fun listenUsers(liveData: MutableLiveData<List<User>>): ListenerRegistration {
+
+        return FirebaseFirestore.getInstance()
+            .collection("users")
+            .addSnapshotListener {value, err ->
+                val users = mutableListOf<User>()
+
+                value?.forEach {  doc->
+                    if(doc.getBoolean("teacher") ?: false) {
+                        users.add(doc.toObject(Teacher::class.java))
+                    }
+                    else {
+                        users.add(doc.toObject(Student::class.java))
+                    }
+                }
+                liveData.postValue(users)
+            }
+    }
 
     fun getTeachersBySubject(
         subject: String,
@@ -343,6 +375,27 @@ data object Database {
     }
 
 
+    suspend fun updateUser(user: User, newName:String, newImage: Uri?) = withContext(Dispatchers.IO) {
+        val value = CompletableDeferred<User>()
+
+        val imageUrl = newImage?.let {
+            uploadImage(it, "userImages/${user.id}")
+        } ?: user.image
+        FirebaseFirestore.getInstance().collection("users")
+            .document(user.id)
+            .update("image", imageUrl, "fullName", newName)
+            .addOnSuccessListener {
+                user.image = imageUrl
+                user.fullName = newName
+                value.complete(user)
+            }
+            .addOnFailureListener {
+                value.completeExceptionally(it)
+            }
+
+        value.await()
+
+    }
     suspend fun register(form: RegisterForm, coroutineScope: CoroutineScope): User =
         withContext(Dispatchers.IO) {
             val value = CompletableDeferred<User>()

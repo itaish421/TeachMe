@@ -37,19 +37,21 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.requests.observe(viewLifecycleOwner) { requests ->
+        viewModel.requestsMediator.observe(viewLifecycleOwner) { requests ->
             val currentUser = viewModel.userState.value?.data ?: return@observe
-            if(requests.isEmpty()) {
+            if(requests.requests.isEmpty()) {
                 binding.noLessonsLayout.visibility = View.VISIBLE
                 binding.exploreTeachers.setOnClickListener {
                     findNavController().popBackStack()
                 }
             }
             binding.rvRequests.adapter = LessonRequestsRvAdapter(
-                if (requests.isNotEmpty()
-                    && requests[0].teacherId == FirebaseAuth.getInstance().uid
+                if (requests.requests.isNotEmpty()
+                    && requests.requests[0].teacherId == FirebaseAuth.getInstance().uid
                 ) {
-                    requests.filter { it.status == LessonRequestStatus.Approved }
+                    requests.requests =
+                    requests.requests.filter { it.status == LessonRequestStatus.Approved }
+                    requests
                 } else {
                     requests
                 },
