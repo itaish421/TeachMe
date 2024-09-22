@@ -33,7 +33,8 @@ class ChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.myChats.observe(viewLifecycleOwner) {
+
+        viewModel.chatsMediator.observe(viewLifecycleOwner) {
             adapter = ChatsAdapter(it, object : ChatsAdapter.ChatListener {
                 override fun enterChat(room: ChatRoom) {
                     val act = ChatsFragmentDirections.actionChatsFragmentToChatFragment(room.id)

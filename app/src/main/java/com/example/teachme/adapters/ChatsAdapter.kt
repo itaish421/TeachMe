@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.teachme.databinding.ChatItemBinding
 import com.example.teachme.models.ChatRoom
+import com.example.teachme.models.ChatRoomPopulated
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
@@ -19,12 +20,11 @@ class ChatsAdapter(
         fun enterChat(room: ChatRoom)
     }
 
-
     inner class ChatsViewHolder(val binding: ChatItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(room: ChatRoom) {
+        fun bind(room: ChatRoomPopulated) {
             val currentUserId = FirebaseAuth.getInstance().uid!!
             binding.chatItem.setOnClickListener {
                 listener.enterChat(room)
@@ -50,7 +50,7 @@ class ChatsAdapter(
     override fun getItemCount(): Int = chats.size
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
-        val chat = chats[position]
+        val chat = chats[position] as? ChatRoomPopulated ?: return
         holder.bind(chat)
     }
 }

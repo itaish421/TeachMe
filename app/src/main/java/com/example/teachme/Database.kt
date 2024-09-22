@@ -175,7 +175,7 @@ data object Database {
                         it.children.mapNotNull { roomData ->
                             roomData.getValue(ChatRoom::class.java)
                         }.firstOrNull { room ->
-                            room.teacher.id == teacher.id && room.student.id == student.id
+                            room.teacherId == teacher.id && room.studentId == student.id
                         }.let { room ->
                             value.complete(
                                 room
@@ -201,8 +201,6 @@ data object Database {
                 val newDoc = FirebaseDatabase.getInstance().getReference("chats").push()
                 val newRoom = ChatRoom(
                     id = newDoc.key!!,
-                    teacher = teacher,
-                    student = student,
                     studentId = student.id,
                     teacherId = teacher.id,
                     messages = mutableListOf()

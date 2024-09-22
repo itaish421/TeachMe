@@ -13,12 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.teachme.R
 import com.example.teachme.databinding.MessageItemBinding
 import com.example.teachme.models.ChatRoom
+import com.example.teachme.models.ChatRoomPopulated
 import com.example.teachme.models.Message
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Calendar
 
 class MessagesAdapter(
-    private val chatRoom: ChatRoom,
+    private val chatRoom: ChatRoomPopulated,
 ) : RecyclerView.Adapter<MessagesAdapter.MessageViewHolder>() {
 
     private val c: Calendar = Calendar.getInstance()

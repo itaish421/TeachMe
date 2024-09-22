@@ -37,7 +37,8 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.requestsMediator.observe(viewLifecycleOwner) { requests ->
+        viewModel.requestsMediator.observe(viewLifecycleOwner) { requestsCopy ->
+            val requests = requestsCopy.copy()
             val currentUser = viewModel.userState.value?.data ?: return@observe
             if(requests.requests.isEmpty()) {
                 binding.noLessonsLayout.visibility = View.VISIBLE

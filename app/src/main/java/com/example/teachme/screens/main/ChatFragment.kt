@@ -17,6 +17,7 @@ import com.example.teachme.adapters.MessagesAdapter
 import com.example.teachme.databinding.FragmentChatBinding
 import com.example.teachme.databinding.FragmentChatsBinding
 import com.example.teachme.models.ChatRoom
+import com.example.teachme.models.ChatRoomPopulated
 import com.example.teachme.models.Student
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -41,6 +42,8 @@ class ChatFragment : Fragment() {
     private val args by navArgs<ChatFragmentArgs>()
     private var currChatListener : ValueEventListener? = null
     private var adapter: MessagesAdapter? = null
+
+
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,9 +55,12 @@ class ChatFragment : Fragment() {
                 binding.etMessage.setText("")
             }
         }
+        binding.allChats.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         viewModel.currChat.observe(viewLifecycleOwner) {
-            it?.let { room ->
+            (it as? ChatRoomPopulated)?.let { room ->
                 adapter = MessagesAdapter(room)
                 Log.d("ChangedRoom", room.messages.size.toString())
                 binding.rvMessages.adapter = adapter

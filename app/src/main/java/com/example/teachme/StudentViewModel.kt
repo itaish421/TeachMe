@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teachme.models.ChatRoom
+import com.example.teachme.models.ChatRoomPopulated
+import com.example.teachme.models.ChatsMediator
 import com.example.teachme.models.LessonRequest
 import com.example.teachme.models.LessonRequestStatus
 import com.example.teachme.models.LessonRequestsData
@@ -43,6 +45,9 @@ class StudentViewModel : ViewModel() {
     private val _myChats: MutableLiveData<List<ChatRoom>> = MutableLiveData()
     val myChats: LiveData<List<ChatRoom>> get() = _myChats
     private val _currChat: MutableLiveData<ChatRoom?> = MutableLiveData()
+
+    val chatsMediator : LiveData<List<ChatRoom>> by ChatsMediator(users, _myChats)
+
     val currChat: LiveData<ChatRoom?> get() = _currChat
     var currChatListener: ValueEventListener? = null
 
@@ -69,11 +74,11 @@ class StudentViewModel : ViewModel() {
                 .removeEventListener(it)
         }
         currChatListener = Database.listenToChat(chatId) {
-            _currChat.postValue(it)
+            val users_ = users.value ?: listOf()
+            _currChat.postValue(it.populated(users_))
         }
         return currChatListener!!
     }
-
 
     fun updateUser(newName: String, newImage: Uri?, callback: () -> Unit) {
 

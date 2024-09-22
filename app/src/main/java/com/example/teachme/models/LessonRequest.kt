@@ -5,7 +5,10 @@ package com.example.teachme.models
 class LessonRequestsData(
     var requests: List<LessonRequest> = listOf(),
     var users: List<User> = listOf()
-)
+) {
+    fun copy(): LessonRequestsData = LessonRequestsData(ArrayList(requests), ArrayList(users))
+}
+
 open class LessonRequest(
     var id: String = "",
     var studentId: String = "",
